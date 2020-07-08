@@ -22,5 +22,5 @@ jobs:
       with:
         ACCESS_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         REPOSITORY_NAME: shimmergem/shimmergem.github.io
-        BRANCH: production
+        BRANCH: master
         FOLDER: dist
