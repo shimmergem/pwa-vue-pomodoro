@@ -19,7 +19,7 @@ jobs:
 
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@releases/v3
-      env:
+      with:
         ACCESS_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         REPOSITORY_NAME: shimmergem/shimmergem
         BRANCH: production
