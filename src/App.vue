@@ -34,6 +34,8 @@ export default {
 <style lang="sass" scoped>
   .container {
     flex-direction: column;
+    width: 100%;
+    height: 100%;
   }
   .page {
     width: 100vw;

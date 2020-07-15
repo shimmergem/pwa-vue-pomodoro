@@ -1,5 +1,5 @@
 <template>
-  <el-menu mode="horizontal" @select="handleSelect">
+  <el-menu mode="horizontal" default-active="TaskList" @select="handleSelect">
     <el-menu-item index="TaskList"><icon-font class="icon" type="iconlist" /></el-menu-item>
     <el-menu-item index="CreateTask"><icon-font class="icon" type="iconplus" /></el-menu-item>
     <el-menu-item index="AppSetting"><icon-font class="icon" type="iconsetting" /></el-menu-item>

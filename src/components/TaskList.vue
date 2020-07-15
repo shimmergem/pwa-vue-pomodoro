@@ -1,6 +1,11 @@
 <template>
-  <div>
-    <task-card v-for="task in taskList" class="task-card" :key="task.primarykey" :taskInfo="task" />
+  <div class="container">
+    <template v-if="taskList.length && taskList.length > 0">
+      <task-card v-for="task in taskList" class="task-card" :key="task.primarykey" :taskInfo="task" />
+    </template>
+    <template v-else>
+      <div class="blank">暂无任务，请添加</div>
+    </template>
   </div>
 </template>
 
@@ -29,8 +34,19 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .task-card {
-    height: 80px;
-    margin-bottom: 12px;
+  .container {
+    width: 100%;
+    height: 100%;
+    .task-card {
+      height: 80px;
+      margin-bottom: 12px;
+    }
+    .blank {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
   }
 </style>
