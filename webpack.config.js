@@ -23,10 +23,10 @@ module.exports = {
         test: /\.vue$/,
         use: ['vue-loader']
       },
-      // {
-      //   test: /\.js$/,
-      //   use: ['babel-loader']
-      // },
+      {
+        test: /\.js$/,
+        use: ['babel-loader']
+      },
       {
         test: /\.sass$/,
         use: [
