@@ -5,9 +5,10 @@ const DISPLAY_MODE = {
 
 let _Vue = null
 
+const isDef = val => val !== null && valu !== undefined
+
 
 class PWAHelper {
-  deferredPrompt = null
   _vm = null
 
   constructor() {
@@ -15,35 +16,27 @@ class PWAHelper {
     this.init()
   }
 
-  get displayMode() {
-    return this._vm.displayMode
-  }
-  set displayMode(val) {
-    this._vm.displayMode = val
-  }
-
   get isInstalled() {
     return this._vm.isInstalled
   }
-  set isInstalled(val) {
-    this._vm.isInstalled = val
-  }
-
   get isPWA () {
-    return this.displayMode === DISPLAY_MODE.STANDALONE
+    return this._vm.isPWA
+  }
+  get needInstall() {
+    return this._vm.needInstall
   }
 
   addListeners() {
     window.addEventListener('DOMContentLoaded', () => {
       console.log(`DOMContentLoaded`)
-      this.displayMode = DISPLAY_MODE.BROWSER_TAB
+      this._vm.displayMode = DISPLAY_MODE.BROWSER_TAB
       if (window.matchMedia('(display-mode: standalone)').matches) {
-        this.displayMode = DISPLAY_MODE.STANDALONE
+        this._vm.displayMode = DISPLAY_MODE.STANDALONE
         this.resizeWindow(480, 640)
       }
       window.matchMedia('(display-mode: standalone)').addListener((evt) => {
         console.log(`display-mode change`)
-        this.displayMode = DISPLAY_MODE.BROWSER_TAB
+        this._vm.displayMode = DISPLAY_MODE.BROWSER_TAB
         if (evt.matches) {
           location.reload()
         }
@@ -52,23 +45,27 @@ class PWAHelper {
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       console.log('beforeinstallprompt')
-      this.deferredPrompt = e || null
+      this._vm.deferredPrompt = e || null
     })
     window.addEventListener("appinstalled", (e) => {
       console.log('appinstalled')
-      this.isInstalled = true
+      this._vm.isInstalled = true
     })
-  }  
+  }
 
   init() {
     this._vm = new _Vue({
       data: {
         displayMode: DISPLAY_MODE.BROWSER_TAB,
         isInstalled: false,
+        deferredPrompt: null,
       },
       computed: {
         isPWA() {
           return this.displayMode === DISPLAY_MODE.STANDALONE
+        },
+        needInstall() {
+          return !this.isInstalled  && isDef(this.deferredPrompt)
         }
       }
     })

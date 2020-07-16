@@ -10,8 +10,8 @@
     </template>
     <template v-else>
       <div class="page">
-        <span v-if="this.PWAHelper.isInstalled">已安装请从PWA启动</span>
-        <a v-else href="#" @click="this.PWAHelper.installPWA">点此安装PWA</a>
+        <a v-if="this.PWAHelper.needInstall" href="#" @click="this.PWAHelper.installPWA">点此安装PWA</a>
+        <span v-else="">已安装请从PWA启动</span>
       </div>
     </template>
   </el-container>
@@ -38,7 +38,8 @@ export default {
     height: 100%;
   }
   .page {
-    width: 100vw;
-    height: 100vh;
+    margin: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
   }
 </style>
