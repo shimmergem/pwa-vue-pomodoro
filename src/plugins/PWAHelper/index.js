@@ -26,6 +26,12 @@ class PWAHelper {
     return this._vm.needInstall
   }
 
+  static install(Vue) {
+    _Vue = Vue
+    let helper = new PWAHelper()
+    Vue.prototype.PWAHelper = helper
+  }
+
   addListeners() {
     window.addEventListener('DOMContentLoaded', () => {
       console.log(`DOMContentLoaded`)
@@ -83,12 +89,5 @@ class PWAHelper {
     let { outcome } = await this.deferredPrompt.userChoice
   }
 }
-
-PWAHelper.install = Vue => {
-  _Vue = Vue
-  let helper = new PWAHelper()
-  Vue.prototype.PWAHelper = helper
-}
-
 
 export default PWAHelper
