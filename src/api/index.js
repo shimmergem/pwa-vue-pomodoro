@@ -8,4 +8,6 @@ const getMusic = (url) => {
   })
 }
 
+const getAllTask = () => getAllTaskFromDB()
+
 export {getMusic}
