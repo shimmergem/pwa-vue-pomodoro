@@ -10,7 +10,7 @@
       <template v-if="remainingTime > 0">
         <icon-font class="icon" @click.native="reset" type="iconreload_time" />
         <template v-if="!isFinished">
-          <icon-font v-if="!isRunning" class="icon" @click.native="start" type="iconplay" />
+          <icon-font v-if="!isRunning" class="icon" @click.native="run" type="iconplay" />
           <icon-font v-else class="icon" @click.native="pause" type="iconsuspended" />
         </template>
       </template>
@@ -22,8 +22,8 @@
 </template>
 
 <script>
-import moment from 'moment'
 import {taskFinishedNotification} from '../utils'
+import Timer from '../utils/Timer'
 import getPlayer from '../utils/player'
 
 export default {
@@ -36,6 +36,9 @@ export default {
   async created() {
     const player = await getPlayer()
   },
+  mounted() {
+    this.initTimer()
+  },
   async beforeDestroy() {
     let data = this.taskInfo.value
     data.duration = this.remainingTime
@@ -44,7 +47,8 @@ export default {
   data() {
     return {
       startTime: 0,
-      currentTime: 0,
+      endTimer: 0,
+      duration: this.taskInfo.value.duration,
       remainingTime: this.taskInfo.value.duration,
       timer: null,
       isFinished: false,
@@ -54,47 +58,49 @@ export default {
   computed: {
   },
   methods: {
-    start() {
-      if (!this.timer) {
-        this.startTime = new Date().getTime()
-        this.isRunning = true
-        this.setTimer()
+    initTimer() {
+      this.timer && this.timer.destory()
+      this.timer = new Timer({
+        duration: this.taskInfo.value.duration,
+      })
+      this.timer.on('start', ({startTime}) => {
+        this.startTime = startTime
+      })
+      this.timer.on('interval', ({remainingTime}) => {
+        this.remainingTime = remainingTime
+      })
+      this.timer.on('end', ({endTime, remainingTime}) => {
+        this.endTime = endTime
+        this.remainingTime = remainingTime
+        taskFinishedNotification(player)
+      })
+      this.timer.on('pause', () => this.isRunning = false)
+    },
+    run() {
+      this.isRunning = true
+      if (this.duration === this.remainingTime) {
+        this.start()
+      } else {
+        this.continue()
       }
     },
+    start() {
+      this.startTime = 0
+      this.timer.start()
+    },
     pause() {
-      this.clearTimer()
-      this.isRunning = false
+      this.timer.pause()
+    },
+    continue() {
+      this.timer.continue()
     },
     reset() {
-      this.clearTimer()
       this.startTime = 0
+      this.endTimer = 0
       this.remainingTime = this.taskInfo.value.duration,
       this.isFinished = false
       this.isRunning = false
-    },
-    setTimer() {
-      this.clearTimer()
-      this.timer = setTimeout(async () => {
-        this.updateTime()
-        if (this.remainingTime <= 0) {
-          this.remainingTime = 0
-          this.isFinished = true
-          const player = await getPlayer()
-          taskFinishedNotification(player)
-          this.clearTimer()
-        } else {
-          this.setTimer()
-        }
-      }, 1000)
-    },
-    clearTimer() {
-      if (this.timer) clearTimeout(this.timer)
-      this.timer = null
-    },
-    updateTime() {
-      const currentTime = new Date().getTime()
-      this.remainingTime = this.remainingTime - (currentTime - this.startTime)
-      this.startTime = currentTime
+      this.initTimer()
     },
     formatNumber(number) {
       if (number >= 10) {

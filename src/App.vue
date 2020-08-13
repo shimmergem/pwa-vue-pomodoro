@@ -1,10 +1,10 @@
 <template>
   <el-container class='container'>
     <template v-if="this.PWAHelper.isPWA">
-      <el-header>
+      <el-header class='header'>
         <Menu />
       </el-header>
-      <el-main>
+      <el-main class='main'>
         <router-view></router-view>
       </el-main>
     </template>
@@ -36,6 +36,12 @@ export default {
     flex-direction: column;
     width: 100%;
     height: 100%;
+  }
+  .header {
+    flex: 0 0;
+  }
+  .main {
+    flex: 1 0;
   }
   .page {
     margin: 10px;

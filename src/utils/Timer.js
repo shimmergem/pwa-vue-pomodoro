@@ -1,6 +1,30 @@
 const isDef = val => val !== null && val !== undefined
 
-class Timer {
+class TimerEvent {
+  callbacksMap = {}
+
+  emit(eventName, ...args) {
+    if (Array.isArray(this.callbacksMap[eventName])) {
+      this.callbacksMap[eventName].forEach(callback => callback(...args))
+    }
+  }
+  on(eventName, callback) {
+    if (!this.callbacksMap[eventName]) {
+      this.callbacksMap[eventName] = []
+    }
+    if (typeof callback === "function") {
+      this.callbacksMap[eventName].push(callback)
+      return () => this.callbacksMap[eventName].filter(ele => ele != callback)
+    } else {
+      return () => {}
+    }
+  }
+  destory() {
+    Object.keys(this.callbacksMap).forEach(key => this.callbacksMap[key] = [])
+  }
+}
+
+class Timer extends TimerEvent {
   duration = 0
   interval = 1000
   remainingTime = 0
@@ -8,29 +32,12 @@ class Timer {
   endTime = null
   timer = null
   markPoint = null
-  _intervalCallback = () => {}
-  _endCallback = () => {}
 
   constructor(options) {
+    super()
     this.duration = options.duration ?? 0
-    this.interval = this.interval ?? 1000
-    this.intervalCallback = options.intervalCallback
-    this.endCallback = options.endCallback
     this.remainingTime = this.duration
-  }
-
-  get intervalCallback() {
-    return this._intervalCallback
-  }
-  set intervalCallback(val) {
-    this._intervalCallback = typeof val === "function" ? val : () => {}
-  }
-
-  get endCallback() {
-    return this._endCallback
-  }
-  set endCallback(val) {
-    this._endCallback = typeof val === "function" ? val : () => {}
+    this.interval = this.interval ?? 1000
   }
 
   get isRunning() {
@@ -40,23 +47,28 @@ class Timer {
   start() {
     if (!this.isRunning) {
       this.startTime = new Date().getTime()
+      this.markPoint = this.startTime
       this.runTimer()
+      this.emit('start', {startTime: this.startTime,})
     }
   }
 
   pause() {
     this.clearTimer()
+    this.emit('pause')
   }
 
   continue() {
+    this.markPoint = new Date().getTime()
     this.runTimer()
+    this.emit('continue')
   }
 
   end() {
     this.remainingTime = 0
     this.endTime = new Date().getTime()
-    this.endCallback({
-      startTime: this.startTime, 
+    this.emit('end', {
+      startTime: this.startTime,
       endTime: this.endTime,
       remainingTime: this.remainingTime
     })
@@ -70,12 +82,12 @@ class Timer {
         this.end()
         this.clearTimer()
       } else {
-        this.intervalCallback({
+        this.emit('interval', {
           startTime: this.startTime,
           endTime: this.endTime,
           remainingTime: this.remainingTime
         })
-        this.continue()
+        this.runTimer()
       }
     }, this.interval)
   }
@@ -87,9 +99,13 @@ class Timer {
 
   updateTime() {
     const currentTime = new Date().getTime()
-    this.markPoint = this.markPoint ?? currentTime
     this.remainingTime = this.remainingTime - (currentTime - this.markPoint)
     this.markPoint = currentTime
+  }
+
+  destory() {
+    super.destory()
+    this.clearTimer()
   }
 
   static getTimerManager() {
