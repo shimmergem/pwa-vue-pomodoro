@@ -69,9 +69,10 @@ export default {
       this.timer.on('interval', ({remainingTime}) => {
         this.remainingTime = remainingTime
       })
-      this.timer.on('end', ({endTime, remainingTime}) => {
+      this.timer.on('end', async ({endTime, remainingTime}) => {
         this.endTime = endTime
         this.remainingTime = remainingTime
+        const player = await getPlayer()
         taskFinishedNotification(player)
       })
       this.timer.on('pause', () => this.isRunning = false)

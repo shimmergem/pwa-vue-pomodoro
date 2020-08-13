@@ -11,6 +11,7 @@ function taskFinishedNotification(player) {
   notification.addEventListener('click', e => {
     notification.close()
   })
+  notification.onshow()
 }
 
 export default taskFinishedNotification
