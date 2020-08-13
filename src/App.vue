@@ -42,6 +42,9 @@ export default {
   }
   .main {
     flex: 1 0;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
   .page {
     margin: 10px;
